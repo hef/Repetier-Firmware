@@ -126,7 +126,7 @@ the wrong direction change INVERT_X_DIR or INVERT_Y_DIR.
 
 /** \brief Micro stepping rate of X, Y and Y tower stepper drivers
 */
-#define MICRO_STEPS 8
+#define MICRO_STEPS 16
 
     /** \brief Number of delta moves in each line. Moves that exceed this figure will be split into multiple lines.
     Increasing this figure can use a lot of memory since 7 bytes * size of line buffer * MAX_SELTA_SEGMENTS_PER_LINE
@@ -154,7 +154,7 @@ the wrong direction change INVERT_X_DIR or INVERT_Y_DIR.
     Overridden if EEPROM activated.*/
     #define YAXIS_STEPS_PER_MM 101.859
     /** \brief Number of steps for a 1mm move in z direction  Overridden if EEPROM activated.*/
-    #define ZAXIS_STEPS_PER_MM 92.599
+    #define ZAXIS/S_STEPS_PER_MM 92.599
 #endif
 
 // ##########################################################################################
@@ -183,7 +183,7 @@ the wrong direction change INVERT_X_DIR or INVERT_Y_DIR.
 // 99 Generic thermistor table 3
 // 100 is AD595
 // 101 is MAX6675
-#define EXT0_TEMPSENSOR_TYPE 97
+#define EXT0_TEMPSENSOR_TYPE 1
 // Analog input pin for reading temperatures or pin enabling SS for MAX6675
 #define EXT0_TEMPSENSOR_PIN TEMP_0_PIN
 // WHich pin enables the heater
@@ -208,7 +208,7 @@ the wrong direction change INVERT_X_DIR or INVERT_Y_DIR.
 #define EXT0_MAX_ACCELERATION 4500
 /** Type of heat manager for this extruder. 
 - 0 = Simply switch on/off if temperature is reached. Works always.
-- 1 = PID Temperature control. Is better but needs good PID values. Defaults are a good start for most extruder.
+- 1 = PID Temperature control. Is better but needs good PID values. Dreefaults are a good start for most extruder.
  Overridden if EEPROM activated.
 */
 #define EXT0_HEAT_MANAGER 1
@@ -292,7 +292,7 @@ The codes are only executed for multiple extruder when changing the extruder. */
 // 99 Generic thermistor table 3
 // 100 is AD595
 // 101 is MAX6675
-#define EXT1_TEMPSENSOR_TYPE 1
+#define EXT1_TEMPSENSOR_TYPE 97
 // Analog input pin for reading temperatures or pin enabling SS for MAX6675
 #define EXT1_TEMPSENSOR_PIN TEMP_1_PIN 
 // WHich pin enables the heater
@@ -470,7 +470,8 @@ You can use the beta from the datasheet or compute it yourself. See
 http://reprap.org/wiki/MeasuringThermistorBeta
 for more details.
 */
-#define GENERIC_THERM1_BETA 4267
+//#define GENERIC_THERM1_BETA 4267
+#define GENERIC_THERM1_BETA 3974
 /** Start temperature for generated thermistor table */
 #define GENERIC_THERM1_MIN_TEMP -20
 /** End Temperature for generated thermistor table */
@@ -631,7 +632,7 @@ on this endstop.
 #define DISABLE_E false
 
 // Inverting axis direction
-#define INVERT_X_DIR true
+#define INVERT_X_DIR false
 #define INVERT_Y_DIR true
 #define INVERT_Z_DIR true
 
@@ -680,9 +681,9 @@ on this endstop.
 // For delta robot Z_MAX_LENGTH is maximum travel of the towers and should be set to the distance between the hotend
 // and the platform when the printer is at its home position.
 // If EEPROM is enabled these values will be overidden with the values in the EEPROM
-#define X_MAX_LENGTH 363.0
-#define Y_MAX_LENGTH 363.0
-#define Z_MAX_LENGTH 363.0
+#define X_MAX_LENGTH 367.83
+#define Y_MAX_LENGTH 367.83
+#define Z_MAX_LENGTH 367.83
 
 // Coordinates for the minimum axis. Can also be negative if you want to have the bed start at 0 and the printer can go to the left side
 // of the bed. Maximum coordinate is given by adding the above X_MAX_LENGTH values.
@@ -695,7 +696,7 @@ on this endstop.
 // ##########################################################################################
 
 // Microstep setting (Only functional when stepper driver microstep pins are connected to MCU. Currently only works for RAMBO boards
-#define MICROSTEP_MODES {8,8,8,8,8} // [1,2,4,8,16]
+#define MICROSTEP_MODES {16,16,16,16,16} // [1,2,4,8,16]
 
 // Motor Current setting (Only functional when motor driver current ref pins are connected to a digital trimpot on supported boards)
 #define MOTOR_CURRENT {175,175,175,175,175} // Values 0-255 (RAMBO 135 = ~0.75A, 185 = ~1A)
@@ -726,7 +727,7 @@ on this endstop.
 
 /**  \brief Horizontal distance bridged by the diagonal push rod when the end effector is in the center. It is pretty close to 50% of the push rod length (250 mm).
 */
-#define DELTA_RADIUS (PRINTER_RADIUS-END_EFFECTOR_HORIZONTAL_OFFSET-CARRIAGE_HORIZONTAL_OFFSET+0.0)
+#define DELTA_RADIUS (PRINTER_RADIUS-END_EFFECTOR_HORIZONTAL_OFFSET-CARRIAGE_HORIZONTAL_OFFSET-1.0)
 
 /** \brief Enable counter to count steps for Z max calculations
 */
@@ -1023,7 +1024,7 @@ matches, the stored values are used to overwrite the settings.
 IMPORTANT: With mode <>0 some changes in configuration.h are not set any more, as they are 
            taken from the EEPROM.
 */
-#define EEPROM_MODE 1
+#define EEPROM_MODE 0
 
 #define SDSUPPORT true
 
@@ -1108,7 +1109,7 @@ Select an encoder speed from 0 = fastest to 2 = slowest that results in one menu
 /** \brief Lowest repeat time. */
 #define UI_KEY_MIN_REPEAT 50
 
-#define FEATURE_BEEPER true
+#define FEATURE_BEEPER false
 /**
 Beeper sound definitions for short beeps during key actions
 and longer beeps for important actions.

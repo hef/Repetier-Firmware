@@ -354,10 +354,20 @@ void updateTrapezoids(byte p) {
   END_INTERRUPT_PROTECTED; 
   byte previdx = p-1;
   if(previdx>=MOVE_CACHE_SIZE) previdx = MOVE_CACHE_SIZE-1;
-  if(lines_count && (lines[previdx].flags & FLAG_WARMUP)==0)
-    computeMaxJunctionSpeed(&lines[previdx],act); // Set maximum junction speed if we have a real move before
+  PrintLine *previous = &lines[previdx];
+  if(lines_count && (previous->flags & FLAG_WARMUP)==0)
+    computeMaxJunctionSpeed(previous,act); // Set maximum junction speed if we have a real move before
   else
     act->joinFlags |= FLAG_JOIN_START_FIXED;
+#if DRIVE_SYSTEM!=3
+    if((previous->primaryAxis==2 && act->primaryAxis!=2) || (previous->primaryAxis!=2 && act->primaryAxis==2)) {
+        previous->joinFlags |= FLAG_JOIN_END_FIXED;
+        act->joinFlags |= FLAG_JOIN_START_FIXED;
+        updateStepsParameter(act);
+        firstLine->flags &= ~FLAG_BLOCKED;
+        return;
+    }
+#endif // DRIVE_SYSTEM
 
   backwardPlanner(p,first);  
   // Reduce speed to reachable speeds
@@ -1123,7 +1133,8 @@ void split_delta_move(byte check_endstops,byte pathOptimize, byte softEndstop) {
 
 	if (save_dir & 48) {
 		// Compute number of seconds for move and hence number of segments needed
-		float seconds = 100 * save_distance / (printer_state.feedrate * printer_state.feedrateMultiply);
+		//float seconds = 100 * save_distance / (printer_state.feedrate * printer_state.feedrateMultiply);
+		float seconds = save_distance / printer_state.feedrate;
 #ifdef DEBUG_SPLIT
 		out.println_float_P(PSTR("Seconds: "), seconds);
 #endif

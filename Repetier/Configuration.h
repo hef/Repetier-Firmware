@@ -49,6 +49,7 @@ To override EEPROM settings with config settings, set EEPROM_MODE 0
 #define NUM_EXTRUDER 1
 
 //// The following define selects which electronics board you have. Please choose the one that matches your setup
+// Gen3 PLUS for RepRap Motherboard V1.2 = 21
 // MEGA/RAMPS up to 1.2       = 3
 // RAMPS 1.3/RAMPS 1.4        = 33
 // Azteeg X3                  = 34
@@ -101,34 +102,23 @@ the wrong direction change INVERT_X_DIR or INVERT_Y_DIR.
     /** \brief Delta drive type: 0 - belts and pulleys, 1 - filament drive */
     #define DELTA_DRIVE_TYPE 0
 
-#if DELTA_DRIVE_TYPE == 0
-/** \brief Pitch in mm of drive belt. GT2 = 2mm
-*/
-#define BELT_PITCH 2
+    #if DELTA_DRIVE_TYPE == 0
+      /** \brief Pitch in mm of drive belt. GT2 = 2mm */
+      #define BELT_PITCH 2
+      /** \brief Number of teeth on X, Y and Z tower pulleys */
+      #define PULLEY_TEETH 20
+      #define PULLEY_CIRCUMFERENCE (BELT_PITCH * PULLEY_TEETH)
+    #elif DELTA_DRIVE_TYPE == 1
+      /** \brief Filament pulley diameter in milimeters */
+      #define PULLEY_DIAMETER 10
+      #define PULLEY_CIRCUMFERENCE (PULLEY_DIAMETER * 3.1415927)
+    #endif
 
-/** \brief Number of teeth on X, Y and Z tower pulleys
-*/
-#define PULLEY_TEETH 15
-#define PULLEY_CIRCUMFERENCE (BELT_PITCH * PULLEY_TEETH)
+    /** \brief Steps per rotation of stepper motor */
+    #define STEPS_PER_ROTATION 200
 
-#elif DELTA_DRIVE_TYPE == 1
-
-/** \brief Filament pulley diameter in milimeters
-*/
-#define PULLEY_DIAMETER 10
-
-#define PULLEY_CIRCUMFERENCE (PULLEY_DIAMETER * 3.1415927)
-
-#endif
-
-
-/** \brief Steps per rotation of stepper motor
-*/
-#define STEPS_PER_ROTATION 200
-
-/** \brief Micro stepping rate of X, Y and Y tower stepper drivers
-*/
-#define MICRO_STEPS 16
+    /** \brief Micro stepping rate of X, Y and Y tower stepper drivers */
+    #define MICRO_STEPS 16
 
     /** \brief Number of delta moves in each line. Moves that exceed this figure will be split into multiple lines.
     Increasing this figure can use a lot of memory since 7 bytes * size of line buffer * MAX_SELTA_SEGMENTS_PER_LINE
@@ -527,9 +517,9 @@ Value is used for all generic tables created. */
 // set to 0 if you don't have a heated bed
 #define HEATED_BED_SENSOR_TYPE 97
 /** Analog pin of analog sensor to read temperature of heated bed.  */
-#define HEATED_BED_SENSOR_PIN TEMP_BED_PIN
+#define HEATED_BED_SENSOR_PIN TEMP_1_PIN
 /** \brief Pin to enable heater for bed. */
-#define HEATED_BED_HEATER_PIN HEATER_BED_PIN
+#define HEATED_BED_HEATER_PIN HEATER_1_PIN
 // How often the temperature of the heated bed is set (msec)
 #define HEATED_BED_SET_INTERVAL 5000
 
@@ -717,7 +707,7 @@ on this endstop.
 /** \brief Number of segments to generate for delta conversions per second of move
 */
 #define DELTA_SEGMENTS_PER_SECOND_PRINT 200 // Move accurate setting for print moves
-#define DELTA_SEGMENTS_PER_SECOND_MOVE 200 // Less accurate setting for other moves
+#define DELTA_SEGMENTS_PER_SECOND_MOVE 70 // Less accurate setting for other moves
 
 /** \brief Horizontal offset of the universal joints on the end effector (moving platform).
 */
@@ -725,7 +715,7 @@ on this endstop.
 
 /** \brief Horizontal offset of the universal joints on the vertical carriages.
 */
-#define CARRIAGE_HORIZONTAL_OFFSET 
+#define CARRIAGE_HORIZONTAL_OFFSET 18
 
 /** \brief Printer radius in mm, measured from the center of the print area to the vertical smooth rod.
 */
@@ -750,7 +740,7 @@ on this endstop.
     This helps cooling the Stepper motors between two print jobs. 
     Overridden if EEPROM activated.
 */
-#define STEPPER_INACTIVE_TIME 120
+#define STEPPER_INACTIVE_TIME 120L
 /** After x seconds of inactivity, the system will go down as far it can.
     It will at least disable all stepper motors and heaters. If the board has
     a power pin, it will be disabled, too. 
@@ -816,14 +806,14 @@ If the interval at full speed is below this value, smoothing is disabled for tha
 /** \brief X, Y, Z max acceleration in mm/s^2 for printing moves or retracts. Make sure your printer can go that high! 
  Overridden if EEPROM activated.
 */
-#define MAX_ACCELERATION_UNITS_PER_SQ_SECOND_X 800
-#define MAX_ACCELERATION_UNITS_PER_SQ_SECOND_Y 800
-#define MAX_ACCELERATION_UNITS_PER_SQ_SECOND_Z 800
+#define MAX_ACCELERATION_UNITS_PER_SQ_SECOND_X 1500
+#define MAX_ACCELERATION_UNITS_PER_SQ_SECOND_Y 1500
+#define MAX_ACCELERATION_UNITS_PER_SQ_SECOND_Z 1500
 
 /** \brief X, Y, Z max acceleration in mm/s^2 for travel moves.  Overridden if EEPROM activated.*/
-#define MAX_TRAVEL_ACCELERATION_UNITS_PER_SQ_SECOND_X 800
-#define MAX_TRAVEL_ACCELERATION_UNITS_PER_SQ_SECOND_Y 800
-#define MAX_TRAVEL_ACCELERATION_UNITS_PER_SQ_SECOND_Z 800
+#define MAX_TRAVEL_ACCELERATION_UNITS_PER_SQ_SECOND_X 3000
+#define MAX_TRAVEL_ACCELERATION_UNITS_PER_SQ_SECOND_Y 3000
+#define MAX_TRAVEL_ACCELERATION_UNITS_PER_SQ_SECOND_Z 3000
 
 /** \brief Maximum allowable jerk.
 
@@ -1031,12 +1021,9 @@ IMPORTANT: With mode <>0 some changes in configuration.h are not set any more, a
            taken from the EEPROM.
 */
 #define EEPROM_MODE 1
-
-#define SDSUPPORT true
-
 /** Set to false to disable SD support: */
 #ifndef SDSUPPORT  // Some boards have sd support on board. These define the values already in pins.h
-#define SDSUPPORT false
+#define SDSUPPORT true
 /** If set to false all files with longer names then 8.3 or having a tilde in the name will be hidden */
 #define SD_ALLOW_LONG_NAMES false
 // Uncomment to enable or changed card detection pin. With card detection the card is mounted on insertion.
@@ -1088,7 +1075,7 @@ Select the language to use.
 #define UI_LANGUAGE 0
 
 // This is line 2 of the status display at startup
-#define UI_VERSION_STRING2 "MAX"
+#define UI_VERSION_STRING2 "Bry and Hef"
 
 /** How many ms should a single page be shown, until it is switched to the next one.*/
 #define UI_PAGES_DURATION 4000
@@ -1133,11 +1120,11 @@ Values must be in range 1..255
 
 // Values used for preheat
 #define UI_SET_PRESET_HEATED_BED_TEMP_PLA 60
-#define UI_SET_PRESET_EXTRUDER_TEMP_PLA   170
-#define UI_SET_PRESET_HEATED_BED_TEMP_ABS 100
+#define UI_SET_PRESET_EXTRUDER_TEMP_PLA   180
+#define UI_SET_PRESET_HEATED_BED_TEMP_ABS 110
 #define UI_SET_PRESET_EXTRUDER_TEMP_ABS   240
 // Extreme values 
-#define UI_SET_MIN_HEATED_BED_TEMP  35
+#define UI_SET_MIN_HEATED_BED_TEMP  55
 #define UI_SET_MAX_HEATED_BED_TEMP 120
 #define UI_SET_MIN_EXTRUDER_TEMP   160
 #define UI_SET_MAX_EXTRUDER_TEMP   270
